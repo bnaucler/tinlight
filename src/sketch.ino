@@ -1,6 +1,6 @@
 /*
 
-	TinLamp 0.5
+	TinLight 0.5
 	Bjorn W Naucler
 	mail@bnaucler.se
 
@@ -16,7 +16,8 @@
 		Disco?
 	* Enum for brightness levels?
 	* Improve flame mode by individual pixel movement?
-	* Reduce code line count for twinkle and increase
+		Or merge with glow?
+	* Reduce code footprint for 'twinkle' and 'increase'
 
 */
 
@@ -98,7 +99,6 @@ void readSensors()
 	if( sw1Read && !sw2Read )	{ currentMode = 2; }
 	if( !sw1Read && sw2Read )	{ currentMode = 3; }
 	if( sw1Read && sw2Read )	{ currentMode = 4; }
-
 }
 
 int setColor(int color)
@@ -136,7 +136,6 @@ int setAll(int color, int brightness)
 
 int worm(int color)
 {
-
 	if(currentMode != previousMode) { setColor(color); previousMode = currentMode; }
 
 	if(millis() > timer + wormInterval)
@@ -150,7 +149,7 @@ int worm(int color)
 		strip.setBrightness(maxBrightness);
 		strip.show();
 
-		wormStartPixel = wormStartPixel + 1;
+		wormStartPixel++;
 		if(wormStartPixel >= numPixels) { wormStartPixel = 0; }
 		timer = millis();
 	}
@@ -190,7 +189,7 @@ int increase(int color)
 			strip.setPixelColor(a, color1, color2, color3); 
 		}
 
-		increaseLength = increaseLength + 1;
+		increaseLength++;
 		if(increaseLength >= numPixels) { 
 			increaseLength = 1; 
 			increaseDirection = !increaseDirection;
@@ -208,7 +207,7 @@ int increase(int color)
 		}
 		for(int a=0; a < increaseLength; a++) { strip.setPixelColor(a, 0, 0, 0); }
 
-		increaseLength = increaseLength + 1;
+		increaseLength++;
 
 		if(increaseLength >= numPixels) { 
 			increaseLength = 1; 
@@ -236,7 +235,7 @@ int twinkle(int color)
 
 	if(millis() > timer + twinkleInterval && twinkleIncrease && !twinklePause)
 	{
-		currentBrightness = currentBrightness + 1;
+		currentBrightness++;
 
 		strip.setPixelColor(twinkleCurrentPixel, color1, color2, color3); 
 		strip.setBrightness(currentBrightness);
@@ -255,7 +254,7 @@ int twinkle(int color)
 
 	if(millis() > timer + twinkleInterval && !twinkleIncrease && !twinklePause)
 	{
-		currentBrightness = currentBrightness - 1;
+		currentBrightness--;
 
 		strip.setPixelColor(twinkleCurrentPixel, color1, color2, color3); 
 		strip.setBrightness(currentBrightness);
@@ -323,12 +322,10 @@ void setup()
 
 void loop()
 { 
-
 	readSensors();
 
 	if(currentMode == 1) { setAll(warmwhite, 255); }
 	if(currentMode == 2) { setAll(yellow, 150); }
 	if(currentMode == 3) { glow(rnd); }
 	if(currentMode == 4) { twinkle(rnd); }
-
 }
